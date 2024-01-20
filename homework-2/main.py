@@ -1,3 +1,7 @@
+#!/usr/bin/python
+
+# -*- coding: utf8 -*-
+
 from src.item import Item
 
 if __name__ == "__main__":

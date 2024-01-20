@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 
 
 class Item:
@@ -9,6 +10,7 @@ class Item:
         self.__name = name
         self.price = price
         self.quantity = quantity
+        self.all.append(self)
 
     @property
     def name(self):
@@ -26,13 +28,20 @@ class Item:
         return self.price
 
     @classmethod
-    def instantiate_from_csv(cls):
-        with open('/Users/Женя/PycharmProjects/electronics-shop-project/src/items.csv', newline="") as csfile:
-            reader = csv.DictReader(csfile)
-            for row in reader:
-                print(row["name"], row["price"], row["quantity"])
-                list_item = cls(row["name"], row["price"], row["quantity"])
-                cls.all.append(list_item)
+    def instantiate_from_csv(cls) -> None:
+        """
+        Создает экземпляры класса Item из данных в файле items.csv.
+        """
+        cls.all.clear()
+        file_path = Path(__file__).parent.joinpath("items.csv")
+        with open(file_path, 'r', encoding='windows-1251') as file:
+            reader = csv.DictReader(file)
+            data = list(reader)
+            for row in data:
+                name = row['name']
+                price = cls.string_to_number(row['price'])
+                quantity = int(row['quantity'])
+                cls(name, price, quantity)
 
     @staticmethod
     def string_to_number(string):
@@ -43,3 +52,8 @@ class Item:
 
     def __str__(self):
         return self.name
+
+    def __add__(self, other) -> int:
+        if isinstance(other, Item):
+            return self.quantity + other.quantity
+        return NotImplemented
