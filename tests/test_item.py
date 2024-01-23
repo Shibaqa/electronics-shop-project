@@ -1,4 +1,4 @@
-from pathlib import Path
+import csv
 
 import pytest
 
@@ -37,4 +37,12 @@ def test_str(item_1):
     assert str(item_1) == 'Смартфон'
 
 
+def test_instantiate_from_csv_file_not_found():
+    with pytest.raises(FileNotFoundError):
+        with open("ite.csv", encoding="windows-1251") as csvfile:
+            items = csv.DictReader(csvfile, delimiter=",")
 
+
+def test_instantiate_from_csv_corrupted_file():
+    with pytest.raises(csv.Error):
+        Item.instantiate_from_csv()

@@ -2,6 +2,12 @@ import csv
 from pathlib import Path
 
 
+class InstantiateCSVError(Exception):
+    def __init__(self, message="Файл item.csv поврежден"):
+        self.message = message
+        super().__init__(self.message)
+
+
 class Item:
     pay_rate = 1.0
     all = []
@@ -34,14 +40,19 @@ class Item:
         """
         cls.all.clear()
         file_path = Path(__file__).parent.joinpath("items.csv")
-        with open(file_path, 'r', encoding='windows-1251') as file:
-            reader = csv.DictReader(file)
-            data = list(reader)
-            for row in data:
-                name = row['name']
-                price = cls.string_to_number(row['price'])
-                quantity = int(row['quantity'])
-                cls(name, price, quantity)
+        try:
+            with open(file_path, 'r', encoding='windows-1251') as file:
+                reader = csv.DictReader(file)
+                data = list(reader)
+                if 'name' not in data or 'price' not in data or 'quantity' not in data:
+                    raise csv.Error('Файл item.csv поврежден')
+                for row in data:
+                    name = row['name']
+                    price = cls.string_to_number(row['price'])
+                    quantity = int(row['quantity'])
+                    cls(name, price, quantity)
+        except FileNotFoundError:
+            raise csv.Error('Файл item.csv поврежден')
 
     @staticmethod
     def string_to_number(string):
