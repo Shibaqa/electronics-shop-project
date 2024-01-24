@@ -1,8 +1,7 @@
-import csv
-
 import pytest
 
-from src.item import Item
+from ploom import OPEN_CSV
+from src.item import Item, InstantiateCSVError
 
 
 @pytest.fixture
@@ -18,7 +17,7 @@ def test_apply_discount(item_1):
     assert item_1.apply_discount() * 0.8 == 8000.0
 
 
-def test_instantiate_from_csv():
+def instantiate_from_csv(cls) -> None:
     Item.instantiate_from_csv()
     assert len(Item.all) == 5
 
@@ -39,10 +38,9 @@ def test_str(item_1):
 
 def test_instantiate_from_csv_file_not_found():
     with pytest.raises(FileNotFoundError):
-        with open("ite.csv", encoding="windows-1251") as csvfile:
-            items = csv.DictReader(csvfile, delimiter=",")
+        Item.instantiate_from_csv("Отсутствует файл item.csv")
 
 
 def test_instantiate_from_csv_corrupted_file():
-    with pytest.raises(csv.Error):
-        Item.instantiate_from_csv()
+    with pytest.raises(InstantiateCSVError):
+        Item.instantiate_from_csv(OPEN_CSV)
